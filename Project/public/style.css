@@ -1,0 +1,53 @@
+ .card1{
+    width: 430px;
+    height: auto;
+    margin: 50px auto;
+    padding: 1px;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.1);
+}
+.card{
+    margin: 50px auto;
+    padding: 1px;
+    width: 550px;
+    height: auto;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.1);             
+}
+    .size
+{
+    width: 320px;      
+    border-color: #008b8b;          
+}
+.form-check-input{
+    border-color: #008b8b;
+}
+.form-check-input:checked {
+    background-color: #008b8b;
+    border-color: #008b8b; 
+}
+.btn-link,.btn-link:hover {
+    color: #008b8b;
+    text-decoration: none;
+}                
+.btn-link:focus {
+    outline: none;
+    box-shadow: none;                   
+}
+.login-button .size,
+.register-button .size{
+    background-color: #008b8b;
+    border-color: #008b8b;
+    font-size: 18px;
+}
+.loginLbl{
+text-align: center;
+}  
+.label-container{
+    text-align: center;
+    color: #008b8b;
+    font-weight: bold;
+    font-size: xx-large;
+}

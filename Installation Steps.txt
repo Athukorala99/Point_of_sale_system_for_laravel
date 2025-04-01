@@ -1,0 +1,13 @@
+Step 1 -> install the applications inside the application folder
+		1. VSCodeUserSetup
+		2. xampp
+		3. Composer-Setup
+		4. node
+
+Step 2 -> There is our project inside the project folder. we have to open it with vs code
+
+Step 3 -> open up the xampp software and start the Apache and MySQL.
+
+Step 4 -> open new three terminal and have to type in 1 terminal (php artisan:migrate),second terminal (npn run dew),thired (php artisan serve)
+
+Step 5 -> click the link and open it up (recommend chrome browser)
