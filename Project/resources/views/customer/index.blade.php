@@ -33,9 +33,11 @@
                                     <td>{{$customer->email}}</td>
                                     <td>{{$customer->phone}}</td>
                                     <td>{{$customer->address}}</td>
-                                    <td>@if($customer->alert_amount <= $customer->amount) <span class="badge badge-danger"> {{$customer->amount }}</span>
-                                            @else <span class="badge badge-success"> {{$customer->amount}} </span>
-                                            @endif
+                                    <td>@if($customer->alert_amount <= $customer->amount) 
+                                            <span class="badge badge-danger"> {{$customer->amount }}</span>
+                                        @else 
+                                            <span class="badge badge-success"> {{$customer->amount}} </span>
+                                        @endif
 
                                     </td>
                                     <td class="action">

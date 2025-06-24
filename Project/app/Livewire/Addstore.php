@@ -39,6 +39,8 @@ class Addstore extends Component
             return session()->flash('error', 'Product not found');
             // return $this->massage ='Product not found';
         }
+
+
         $countCartProduct = addstorecart::where('barcode', $this->product_code)->where('user_id', auth()->user()->id)->count();
         $cartProductprice = addstorecart::where('barcode', $this->product_code)->where('user_id', auth()->user()->id)->first();
         if ($countCartProduct > 0 && $cartProductprice->product_price == $qtyprice && $qtyprice && $qtyadd) {
@@ -50,7 +52,9 @@ class Addstore extends Component
             $carts->update(['total_price' => $total_price]);
             $this->mount();
             return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
-        }  else if ($countCartProduct > 0 && $cartProductprice->product_price == $qtyprice && !$qtyprice && !$qtyadd) {
+        }  
+        
+        else if ($countCartProduct > 0 && $cartProductprice->product_price == $qtyprice && !$qtyprice && !$qtyadd) {
             // $this->IncrementQty($this->product_code);
             $carts = addstorecart::where("barcode", $this->product_code)->where('user_id', auth()->user()->id)->first();
             $carts->increment('product_qty', 1);
@@ -60,6 +64,10 @@ class Addstore extends Component
             $this->mount();
             return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
         }
+
+
+
+        
           else if (!$qtyprice && !$qtyadd) {
             $add_to_cart = new addstorecart;
             $add_to_cart->product_id = $countProduct->id;

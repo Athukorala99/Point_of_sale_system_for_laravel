@@ -38,7 +38,12 @@ class AddstoreController extends Controller
 
 
         $supp = Supplier::where('id', $supplierr)->first();
+        $supp_count = Supplier::where('id',$supplierr)->count();
+        if($supp_count == '0'){
+            $suppliersr = '';
+        }else{
         $suppliersr = $supp->supplier_name;
+        }
         // new added variables
 
 

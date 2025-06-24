@@ -53,7 +53,8 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <input type="number" value="{{$cart->product_price / $cart->product_qty}}" name="price[]" id="price" class="form-control price" @if($cart->product->editprice == 0) readonly @endif >
+                                        <input type="number" wire:change="priceChanged($event.target.value,{{ $cart->id }})" value="{{$cart->product_price / $cart->product_qty}}"  name="price[]" id="price" class="form-control price" 
+                                           @if($cart->product->editprice == 0) readonly @endif >
                                     </td>
 
                                     <td>

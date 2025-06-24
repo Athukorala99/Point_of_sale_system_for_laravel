@@ -190,71 +190,64 @@
           myReceipt.close();
         }, 8000);
       }
-    document.addEventListener('DOMContentLoaded', function() {
-        // coin -------------------------------------
-        const rsone = document.getElementById('rsone');
-        const rsonet = document.getElementById('rsonet');
+document.addEventListener('DOMContentLoaded', function() {
+    // coin -------------------------------------
+    const rsone = document.getElementById('rsone');
+    const rsonet = document.getElementById('rsonet');
 
-        const rs2 = document.getElementById('rs2');
-        const rs2t = document.getElementById('rs2t');
+    const rs2 = document.getElementById('rs2');
+    const rs2t = document.getElementById('rs2t');
 
-        const rs5 = document.getElementById('rs5');
-        const rs5t = document.getElementById('rs5t');
+    const rs5 = document.getElementById('rs5');
+    const rs5t = document.getElementById('rs5t');
 
-        const rs10 = document.getElementById('rs10');
-        const rs10t = document.getElementById('rs10t');
+    const rs10 = document.getElementById('rs10');
+    const rs10t = document.getElementById('rs10t');
+    // note -------------------------------------
+    const rs20 = document.getElementById('rs20');
+    const rs20t = document.getElementById('rs20t');
 
+    const rs50 = document.getElementById('rs50');
+    const rs50t = document.getElementById('rs50t');
 
-        // note -------------------------------------
-        const rs20 = document.getElementById('rs20');
-        const rs20t = document.getElementById('rs20t');
+    const rs100 = document.getElementById('rs100');
+    const rs100t = document.getElementById('rs100t');
 
-        const rs50 = document.getElementById('rs50');
-        const rs50t = document.getElementById('rs50t');
+    const rs500 = document.getElementById('rs500');
+    const rs500t = document.getElementById('rs500t');
 
-        const rs100 = document.getElementById('rs100');
-        const rs100t = document.getElementById('rs100t');
+    const rs1000 = document.getElementById('rs1000');
+    const rs1000t = document.getElementById('rs1000t');
 
-        const rs500 = document.getElementById('rs500');
-        const rs500t = document.getElementById('rs500t');
+    const rs5000 = document.getElementById('rs5000');
+    const rs5000t = document.getElementById('rs5000t');
+    // total--------------------------------------
+    const cointotal = document.getElementById('cointotal');
+    const total_money = document.getElementById('total_money');
+    const note_total = document.getElementById('note_total');
+    const total_moneyin = document.getElementById('total_moneyin');
+    
+    rsone.addEventListener('input', function() {
+        const rsonee = parseFloat(rsone.value) || 0;
+        rsonet.value = 1 * rsonee;
+        // coin
+        const rsoneet = parseFloat(rsonet.value) || 0;
+        const rs2tt = parseFloat(rs2t.value) || 0;
+        const rs5tt = parseFloat(rs5t.value) || 0;
+        const rs10tt = parseFloat(rs10t.value) || 0;
+        // note
+        const rs20tt = parseFloat(rs20t.value) || 0;
+        const rs50tt = parseFloat(rs50t.value) || 0;
+        const rs100tt = parseFloat(rs100t.value) || 0;
+        const rs500tt = parseFloat(rs500t.value) || 0;
+        const rs1000tt = parseFloat(rs1000t.value) || 0;
+        const rs5000tt = parseFloat(rs5000t.value) || 0;
 
-        const rs1000 = document.getElementById('rs1000');
-        const rs1000t = document.getElementById('rs1000t');
-
-        const rs5000 = document.getElementById('rs5000');
-        const rs5000t = document.getElementById('rs5000t');
-
-        // total--------------------------------------
-
-        const cointotal = document.getElementById('cointotal');
-        const total_money = document.getElementById('total_money');
-        const note_total = document.getElementById('note_total');
-        const total_moneyin = document.getElementById('total_moneyin');
-        // coin -------------------------------------
-
-        rsone.addEventListener('input', function() {
-            const rsonee = parseFloat(rsone.value) || 0;
-            rsonet.value = 1 * rsonee;
-            // coin
-            const rsoneet = parseFloat(rsonet.value) || 0;
-            const rs2tt = parseFloat(rs2t.value) || 0;
-            const rs5tt = parseFloat(rs5t.value) || 0;
-            const rs10tt = parseFloat(rs10t.value) || 0;
-
-            // note
-            const rs20tt = parseFloat(rs20t.value) || 0;
-            const rs50tt = parseFloat(rs50t.value) || 0;
-            const rs100tt = parseFloat(rs100t.value) || 0;
-            const rs500tt = parseFloat(rs500t.value) || 0;
-            const rs1000tt = parseFloat(rs1000t.value) || 0;
-            const rs5000tt = parseFloat(rs5000t.value) || 0;
-
-
-            cointotal.value = rsoneet + rs2tt + rs5tt + rs10tt;
-            note_total.value = rs20tt + rs50tt + rs100tt + rs500tt + rs1000tt + rs5000tt;
-            total_money.value = rsoneet + rs2tt + rs5tt + rs10tt + rs20tt + rs50tt + rs100tt + rs500tt + rs1000tt + rs5000tt;
-            total_moneyin.value = rsoneet + rs2tt + rs5tt + rs10tt + rs20tt + rs50tt + rs100tt + rs500tt + rs1000tt + rs5000tt;
-        });
+        cointotal.value = rsoneet + rs2tt + rs5tt + rs10tt;
+        note_total.value = rs20tt + rs50tt + rs100tt + rs500tt + rs1000tt + rs5000tt;
+        total_money.value = rsoneet + rs2tt + rs5tt + rs10tt + rs20tt + rs50tt + rs100tt + rs500tt + rs1000tt + rs5000tt;
+        total_moneyin.value = rsoneet + rs2tt + rs5tt + rs10tt + rs20tt + rs50tt + rs100tt + rs500tt + rs1000tt + rs5000tt;
+    });
 
         rs2.addEventListener('input', function() {
             const rs2e = parseFloat(rs2.value) || 0;

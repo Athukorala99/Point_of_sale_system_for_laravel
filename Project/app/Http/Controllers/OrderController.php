@@ -76,7 +76,6 @@ class OrderController extends Controller
                         $order_id =   $orders->id;
 
                         //order detail modeal
-
                         $transac = 0;
                         for ($product_id = 0; $product_id < count($request->product_id); $product_id++) {
                             $order_details = new Order_detail;
@@ -88,8 +87,6 @@ class OrderController extends Controller
                             $order_details->amount = $request->total_amount[$product_id];
                             $order_details->userid = auth()->user()->id;
                             $order_details->save();
-                            $transac = $transac + $request->total_amount[$product_id];
-
                             $product_details = Product::find($request->product_id[$product_id]);
                             $product_details->quantity = $product_details->quantity - $request->quantity[$product_id];
                             $product_details->save();
@@ -107,9 +104,6 @@ class OrderController extends Controller
                                         if ($grnproduct->stock_quantity < $qty) {
                                             $abc = $qty - $grnproduct->stock_quantity;
                                             $qty = $abc;
-
-
-
                                             // proft Table 
                                             $profit = new profitdetails;
                                             $profit->order_id = $order_id;
@@ -120,17 +114,12 @@ class OrderController extends Controller
                                             $profit->date = now()->toDateString();
                                             $profit->user_id = auth()->user()->id;
                                             $profit->save();
-
-
-
                                             $grnproduct->stock_quantity = 0;
                                             $grnproduct->save();
                                         } else {
 
+
                                             // proft Table
-                                            
-
-
                                             $profit = new profitdetails;
                                             $profit->order_id = $order_id;
                                             $profit->product_id = $request->product_id[$product_id];
@@ -141,10 +130,7 @@ class OrderController extends Controller
                                             $profit->user_id = auth()->user()->id;
                                             $profit->save();
 
-
-
-
-
+                                            
                                             $grnproduct->stock_quantity = $grnproduct->stock_quantity - $qty;
                                             $grnproduct->save();
                                             break;

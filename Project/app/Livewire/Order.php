@@ -12,7 +12,7 @@ use App\Models\Deleteitem;
 
 class Order extends Component
 {
-    public $orders, $products,$customers = [], $product_code, $massage = '', $productIncart, $qty ,$holdlists;
+    public $orders, $products, $customers = [], $product_code, $massage, $product_price = '', $productIncart, $qty, $holdlists;
 
     // public $product_code= ""  ;
     public $pay_money;
@@ -23,11 +23,21 @@ class Order extends Component
 
     public function mount()
     {
-        $this->customers= customer::all();
+        $this->customers = customer::all();
         $this->products = Product::all();
-        $this->productIncart = Cart::where('user_id',auth()->user()->id)->get();
-        $this->holdlists = Hold_order::where('user_id',auth()->user()->id)->get();
+        $this->productIncart = Cart::where('user_id', auth()->user()->id)->get();
+        $this->holdlists = Hold_order::where('user_id', auth()->user()->id)->get();
     }
+    public function priceChanged($value, $cartId)
+    {
+        $carts = Cart::find($cartId);
+        $cart_product_price = $carts->product_qty * $value;
+        $updatediscount = $carts->product_qty * ($carts->product->price - $value);
+        $carts->update(['product_price' => $cart_product_price, 'discount' => $updatediscount]);
+        $this->mount();
+    }
+
+
     public function InsertoCart_wholesale()
     {
         $countProduct = Product::where('barcode', $this->product_code)->first();  // this change id
@@ -37,14 +47,11 @@ class Order extends Component
             if (strlen($this->product_code) == 12) {
                 // Get the first 7 characters of the barcode
                 $firstPart = substr($this->product_code, 0, 7);
-
                 // Get the last 5 characters and calculate the percentage
                 $lastPart = substr($this->product_code, 7, 5);
-
                 $kilogram = substr($lastPart, 0, 2);
                 $grame = substr($lastPart, 2, 5);
                 $percentage = $kilogram . '.' . $grame;
-
                 // Format the message to display both parts
                 if (!$firstPart) {
                     return session()->flash('error', 'Product not found');
@@ -54,11 +61,10 @@ class Order extends Component
 
                     // $this->IncrementQty($this->product_code);
                     $carts = Cart::where('barcode', $firstPart)->where('user_id', auth()->user()->id)->first();
-
                     $carts->increment('product_qty', $percentage);
                     $updatePrice = $carts->product_qty * $carts->product->wholesale_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->wholesale_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -75,10 +81,6 @@ class Order extends Component
                     $add_to_cart->discount = $product->price - $product->wholesale_price;
                     $add_to_cart->save();
                     // $this->mount();
-
-
-
-
                     $this->productIncart->prepend($add_to_cart);
                     // $this->product_code = "";
                 }
@@ -94,7 +96,7 @@ class Order extends Component
                     $carts->increment('product_qty', 1);
                     $updatePrice = $carts->product_qty * $carts->product->wholesale_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->wholesale_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -107,10 +109,6 @@ class Order extends Component
                     $add_to_cart->discount = $countProduct->price - $countProduct->wholesale_price;
                     $add_to_cart->save();
                     // $this->mount();
-
-
-
-
                     $this->productIncart->prepend($add_to_cart);
                     // $this->product_code = "";
                 }
@@ -135,16 +133,16 @@ class Order extends Component
                 if (!$firstPart) {
                     return session()->flash('error', 'Product not found');
                 }
-                $countCartProduct = Cart::where('barcode', $firstPart)->where('user_id',auth()->user()->id)->count();
+                $countCartProduct = Cart::where('barcode', $firstPart)->where('user_id', auth()->user()->id)->count();
                 if ($countCartProduct > 0) {
 
                     // $this->IncrementQty($this->product_code);
-                    $carts = Cart::where('barcode', $firstPart)->where('user_id',auth()->user()->id)->first();
+                    $carts = Cart::where('barcode', $firstPart)->where('user_id', auth()->user()->id)->first();
 
                     $carts->increment('product_qty', ($percentage * $qtyadd));
                     $updatePrice = $carts->product_qty * $carts->product->wholesale_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->wholesale_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -160,7 +158,7 @@ class Order extends Component
                     $add_to_cart->product_price = (($product->wholesale_price) * ($percentage * $qtyadd));
 
                     $add_to_cart->user_id = auth()->user()->id;
-                    $add_to_cart->discount = ($product->price - $product->wholesale_price)*$add_to_cart->product_qty;
+                    $add_to_cart->discount = ($product->price - $product->wholesale_price) * $add_to_cart->product_qty;
                     $add_to_cart->save();
                     // $this->mount();
 
@@ -175,14 +173,14 @@ class Order extends Component
                     return session()->flash('error', 'Product not found');
                     // return $this->massage ='Product not found';
                 }
-                $countCartProduct = Cart::where('barcode', $this->product_code)->where('user_id',auth()->user()->id)->count();
+                $countCartProduct = Cart::where('barcode', $this->product_code)->where('user_id', auth()->user()->id)->count();
                 if ($countCartProduct > 0) {
                     // $this->IncrementQty($this->product_code);
-                    $carts = Cart::where("barcode", $this->product_code)->where('user_id',auth()->user()->id)->first();
+                    $carts = Cart::where("barcode", $this->product_code)->where('user_id', auth()->user()->id)->first();
                     $carts->increment('product_qty', $qtyadd);
                     $updatePrice = $carts->product_qty * $carts->product->wholesale_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->wholesale_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -192,7 +190,7 @@ class Order extends Component
                     $add_to_cart->product_qty = $qtyadd;
                     $add_to_cart->product_price = ($countProduct->wholesale_price * $qtyadd);
                     $add_to_cart->user_id = auth()->user()->id;
-                    $add_to_cart->discount = ($countProduct->price - $countProduct->wholesale_price)*$qtyadd;
+                    $add_to_cart->discount = ($countProduct->price - $countProduct->wholesale_price) * $qtyadd;
 
                     $add_to_cart->save();
                     // $this->mount();
@@ -212,7 +210,7 @@ class Order extends Component
         // $this->mount();
         $countProduct = Product::where('barcode', $this->product_code)->first();  // this change id
         $qtyadd = $this->qty;
-       
+
         if (!$qtyadd) {
             //scale product filter
             if (strlen($this->product_code) == 12) {
@@ -239,7 +237,7 @@ class Order extends Component
                     $carts->increment('product_qty', $percentage);
                     $updatePrice = $carts->product_qty * $carts->product->retail_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->retail_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -267,7 +265,7 @@ class Order extends Component
                     $carts->increment('product_qty', 1);
                     $updatePrice = $carts->product_qty * $carts->product->retail_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->retail_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -299,16 +297,16 @@ class Order extends Component
                 if (!$firstPart) {
                     return session()->flash('error', 'Product not found');
                 }
-                $countCartProduct = Cart::where('barcode', $firstPart)->where('user_id',auth()->user()->id)->count();
+                $countCartProduct = Cart::where('barcode', $firstPart)->where('user_id', auth()->user()->id)->count();
                 if ($countCartProduct > 0) {
 
                     // $this->IncrementQty($this->product_code);
-                    $carts = Cart::where('barcode', $firstPart)->where('user_id',auth()->user()->id)->first();
+                    $carts = Cart::where('barcode', $firstPart)->where('user_id', auth()->user()->id)->first();
 
                     $carts->increment('product_qty', ($percentage * $qtyadd));
                     $updatePrice = $carts->product_qty * $carts->product->retail_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->retail_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -322,7 +320,7 @@ class Order extends Component
                     $add_to_cart->product_qty = ($percentage * $qtyadd);
                     $add_to_cart->product_price = (($product->retail_price) * ($percentage * $qtyadd));
                     $add_to_cart->user_id = auth()->user()->id;
-                    $add_to_cart->discount = ($product->price - $product->retail_price)*$add_to_cart->product_qty;
+                    $add_to_cart->discount = ($product->price - $product->retail_price) * $add_to_cart->product_qty;
                     $add_to_cart->save();
                     // $this->mount();
 
@@ -334,14 +332,14 @@ class Order extends Component
                     return session()->flash('error', 'Product not found');
                     // return $this->massage ='Product not found';
                 }
-                $countCartProduct = Cart::where('barcode', $this->product_code)->where('user_id',auth()->user()->id)->count();
+                $countCartProduct = Cart::where('barcode', $this->product_code)->where('user_id', auth()->user()->id)->count();
                 if ($countCartProduct > 0) {
                     // $this->IncrementQty($this->product_code);
-                    $carts = Cart::where("barcode", $this->product_code)->where('user_id',auth()->user()->id)->first();
+                    $carts = Cart::where("barcode", $this->product_code)->where('user_id', auth()->user()->id)->first();
                     $carts->increment('product_qty', $qtyadd);
                     $updatePrice = $carts->product_qty * $carts->product->retail_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->retail_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -351,7 +349,7 @@ class Order extends Component
                     $add_to_cart->product_qty = $qtyadd;
                     $add_to_cart->product_price = ($countProduct->retail_price * $qtyadd);
                     $add_to_cart->user_id = auth()->user()->id;
-                    $add_to_cart->discount = ($countProduct->price - $countProduct->retail_price)*$qtyadd;
+                    $add_to_cart->discount = ($countProduct->price - $countProduct->retail_price) * $qtyadd;
                     $add_to_cart->save();
 
                     $this->productIncart->prepend($add_to_cart);
@@ -365,10 +363,13 @@ class Order extends Component
     }
     public function InsertoCart_special()
     {
+
+
+
         // $this->mount();
         $countProduct = Product::where('barcode', $this->product_code)->first();  // this change id
         $qtyadd = $this->qty;
-        
+
         if (!$qtyadd) {
             //scale product filter
             if (strlen($this->product_code) == 12) {
@@ -395,7 +396,7 @@ class Order extends Component
                     $carts->increment('product_qty', $percentage);
                     $updatePrice = $carts->product_qty * $carts->product->special_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->special_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -431,7 +432,7 @@ class Order extends Component
                     $carts->increment('product_qty', 1);
                     $updatePrice = $carts->product_qty * $carts->product->special_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->special_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -465,16 +466,16 @@ class Order extends Component
                 if (!$firstPart) {
                     return session()->flash('error', 'Product not found');
                 }
-                $countCartProduct = Cart::where('barcode', $firstPart)->where('user_id',auth()->user()->id)->count();
+                $countCartProduct = Cart::where('barcode', $firstPart)->where('user_id', auth()->user()->id)->count();
                 if ($countCartProduct > 0) {
 
                     // $this->IncrementQty($this->product_code);
-                    $carts = Cart::where('barcode', $firstPart)->where('user_id',auth()->user()->id)->first();
+                    $carts = Cart::where('barcode', $firstPart)->where('user_id', auth()->user()->id)->first();
 
                     $carts->increment('product_qty', ($percentage * $qtyadd));
                     $updatePrice = $carts->product_qty * $carts->product->special_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->special_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -488,7 +489,7 @@ class Order extends Component
                     $add_to_cart->product_qty = ($percentage * $qtyadd);
                     $add_to_cart->product_price = (($product->special_price) * ($percentage * $qtyadd));
                     $add_to_cart->user_id = auth()->user()->id;
-                    $add_to_cart->discount = ($product->price - $product->special_price)*$add_to_cart->product_qty;
+                    $add_to_cart->discount = ($product->price - $product->special_price) * $add_to_cart->product_qty;
                     $add_to_cart->save();
 
                     $this->productIncart->prepend($add_to_cart);
@@ -499,14 +500,14 @@ class Order extends Component
                     return session()->flash('error', 'Product not found');
                     // return $this->massage ='Product not found';
                 }
-                $countCartProduct = Cart::where('barcode', $this->product_code)->where('user_id',auth()->user()->id)->count();
+                $countCartProduct = Cart::where('barcode', $this->product_code)->where('user_id', auth()->user()->id)->count();
                 if ($countCartProduct > 0) {
                     // $this->IncrementQty($this->product_code);
-                    $carts = Cart::where("barcode", $this->product_code)->where('user_id',auth()->user()->id)->first();
+                    $carts = Cart::where("barcode", $this->product_code)->where('user_id', auth()->user()->id)->first();
                     $carts->increment('product_qty', $qtyadd);
                     $updatePrice = $carts->product_qty * $carts->product->special_price;
                     $updatediscount = $carts->product_qty * ($carts->product->price - $carts->product->special_price);
-                    $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+                    $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
                     $this->mount();
                     return session()->flash('success', 'Product ' . $carts->product->product_name . ' already exist in cart add quantity');
                 } else {
@@ -516,7 +517,7 @@ class Order extends Component
                     $add_to_cart->product_qty = $qtyadd;
                     $add_to_cart->product_price = ($countProduct->special_price * $qtyadd);
                     $add_to_cart->user_id = auth()->user()->id;
-                    $add_to_cart->discount = ($countProduct->price - $countProduct->special_price)*$qtyadd;
+                    $add_to_cart->discount = ($countProduct->price - $countProduct->special_price) * $qtyadd;
                     $add_to_cart->save();
                     // $this->mount();
 
@@ -535,13 +536,13 @@ class Order extends Component
     }
     public function IncrementQty($cartId)
     {
-        
+
         $carts = Cart::find($cartId);
         $nowprice = $carts->product_price / $carts->product_qty;
         $carts->increment('product_qty', 1);
         $updatePrice = $carts->product_qty * $nowprice;
         $updatediscount = $carts->product_qty * ($carts->product->price - $nowprice);
-        $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+        $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
         $this->mount();
     }
 
@@ -555,7 +556,7 @@ class Order extends Component
         $carts->decrement('product_qty', 1);
         $updatePrice = $carts->product_qty * $nowprice;
         $updatediscount = $carts->product_qty * ($carts->product->price - $nowprice);
-        $carts->update(['product_price' => $updatePrice,'discount' => $updatediscount]);
+        $carts->update(['product_price' => $updatePrice, 'discount' => $updatediscount]);
         $this->mount();
     }
     public function removeProduct($cartId)
@@ -588,30 +589,29 @@ class Order extends Component
 
         $updatePrice = $carts->product_qty * $carts->product->price;
         $updatediscount = $carts->product_qty * $carts->discount;
-        $carts->update(['product_price' => $updatePrice,'updatediscount' => $updatediscount]);
+        $carts->update(['product_price' => $updatePrice, 'updatediscount' => $updatediscount]);
     }
 
     public function render()
     {
         // if($this->cashtxt !='' || $this->banktxt !='' || $this->credittxt !=''){
-            $CashAmount = (Float) $this->cashtxt ;
-            $BankAmount = (Float) $this->banktxt ;
-            $CreditAmount = (Float) $this->credittxt ;
-            $this->pay_money = $CashAmount + $BankAmount + $CreditAmount;
+        $CashAmount = (float) $this->cashtxt;
+        $BankAmount = (float) $this->banktxt;
+        $CreditAmount = (float) $this->credittxt;
+        $this->pay_money = $CashAmount + $BankAmount + $CreditAmount;
 
-            // $this->pay_money = (Float) $this->cashtxt + (Float) $this->banktxt + (Float) $this->credittxt ;
-            // return session()->flash('error', 'wada na bn');
-            
+        // $this->pay_money = (Float) $this->cashtxt + (Float) $this->banktxt + (Float) $this->credittxt ;
+        // return session()->flash('error', 'wada na bn');
+
         if ($this->pay_money > 0) {
-            
+
 
             // $totalAmount = $CashAmount + $BankAmount + $CreditAmount;
 
             $totalAmount = $this->pay_money - $this->productIncart->sum('product_price');
             $this->balance = $totalAmount;
-            
         }
-    // }
+        // }
 
         return view('livewire.order');
     }
